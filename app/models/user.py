@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from pydantic import EmailStr
@@ -13,21 +13,7 @@ class User(UserBase, table=True):
     hashed_password: str
     is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
     # Relationships
     projects: List["Project"] = Relationship(back_populates="owner")
-
-class UserCreate(UserBase):
-    password: str = Field(min_length=8)
-
-class UserRead(UserBase):
-    id: int
-    is_active: bool
-    created_at: datetime
-
-class UserUpdate(SQLModel):
-    email: Optional[EmailStr] = None
-    username: Optional[str] = None
-    password: Optional[str] = None
-    is_active: Optional[bool] = None
